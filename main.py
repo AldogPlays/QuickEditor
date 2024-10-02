@@ -28,6 +28,7 @@ class CropperApp:
         self.shift_amount = 10  # Amount of shift per arrow key press
         self.source_folder = None  # Store the source folder path
         self.edits_folder = None  # Store the folder for edited images
+        self.save_count = 1  # Start saving versions at v1
 
         # Initialize UI variables for image and crop specs
         self.original_image_info = StringVar()
@@ -47,8 +48,8 @@ class CropperApp:
         self.overlay_frame.place(relx=0.5, rely=0.9, anchor='center')
 
         # Add buttons to the overlay frame
-        self.next_button = Button(self.overlay_frame, text="Next", command=self.save_and_next_image, padx=10, pady=5,
-                                  font=("Helvetica", 12))
+        self.next_button = Button(self.overlay_frame, text="Next", command=self.next_image_without_saving, padx=10,
+                                  pady=5, font=("Helvetica", 12))
         self.next_button.pack(side="left", padx=5)
 
         self.exit_button = Button(self.overlay_frame, text="Exit Fullscreen", command=self.exit_fullscreen, padx=10,
@@ -73,7 +74,13 @@ class CropperApp:
         self.root.bind("<Right>", self.move_right)
         self.root.bind("<Up>", self.move_up)
         self.root.bind("<Down>", self.move_down)
-        self.root.bind("<Return>", self.save_and_next_image)
+        self.root.bind("<Return>", self.save_and_next_image)  # Existing Enter behavior
+
+        # New: Save without moving to next image (lambda to ensure event is passed)
+        self.root.bind("s", lambda event: self.save_current_image(event))
+        # New: Move to the next image without saving
+        self.root.bind("n", lambda event: self.next_image_without_saving(event))
+
         self.root.bind("<Escape>", self.exit_fullscreen)
         self.root.bind("+", self.increase_crop_size)
         self.root.bind("-", self.decrease_crop_size)
@@ -308,23 +315,39 @@ class CropperApp:
 
     def save_and_next_image(self, event=None):
         # Save the cropped image to the edited folder and proceed to the next image
+        self.save_current_image(event)
+        self.next_image()
+
+    def save_current_image(self, event=None):
+        # Save the cropped image to the edited folder without moving to the next image
         if self.current_image_index < len(self.images):
             cropped_image = self.original_image.crop(self.crop_box)
             img_path = self.images[self.current_image_index]
-            img_name = os.path.basename(img_path)
-            save_path = os.path.join(self.edits_folder, img_name)
-            cropped_image.save(save_path)
+            img_name, img_ext = os.path.splitext(os.path.basename(img_path))
 
-            # Move to the next image
-            self.current_image_index += 1
-            if self.current_image_index < len(self.images):
-                self.load_image()
-            else:
-                # If no more images, update the label and stop
-                self.cropped_area_info.set("All images processed!")
+            # Save each image with a version suffix, starting at _v1
+            img_name = f"{img_name}_v{self.save_count}"
+            save_path = os.path.join(self.edits_folder, img_name + img_ext)
+
+            cropped_image.save(save_path)
+            print(f"Image saved: {save_path}")  # Confirm save action with a print statement
+
+            # Increment the save count for subsequent saves of the same image
+            self.save_count += 1
+
+    def next_image(self):
+        # Move to the next image without saving
+        self.current_image_index += 1
+        self.save_count = 1  # Reset the save count to start from _v1 for the next image
+        if self.current_image_index < len(self.images):
+            self.load_image()
         else:
-            # If the index is already out of range, stop processing
-            self.cropped_area_info.set("No more images to process!")
+            # If no more images, update the label and stop
+            self.cropped_area_info.set("All images processed!")
+
+    def next_image_without_saving(self, event=None):
+        # Move to the next image without saving
+        self.next_image()
 
     def set_crop_preset(self, event):
         # Set the crop preset based on the number key pressed
