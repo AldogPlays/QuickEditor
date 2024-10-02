@@ -1,11 +1,11 @@
-# ✂️ Quick Editor
+# ✂️ QuickEditor v1.0
 
-Quick Editor is a simple image cropper designed to allow you to quickly edit and crop multiple images using predefined cropping presets. The app provides a fast and intuitive interface for batch-editing images, with dynamic zoom, manual crop box adjustments, and customizable save functionality.
+**QuickEditor** is a fast, lightweight image cropper designed for batch-editing multiple images using predefined cropping presets. With an intuitive interface, it allows you to zoom, manually adjust crop boxes, and save images with ease.
 
 ## 🌟 Features
 
-- **📂 Batch Image Editing**: Select a folder containing images and quickly edit all images in the folder.
-- **📐 Cropping Presets**: Choose from six different cropping presets:
+- **📂 Batch Image Editing**: Edit entire folders of images in just a few clicks.
+- **📐 Cropping Presets**: Choose from six aspect ratio presets:
   - 16:9 (Horizontal)
   - 9:16 (Vertical)
   - 4:3 (Horizontal)
@@ -13,32 +13,41 @@ Quick Editor is a simple image cropper designed to allow you to quickly edit and
   - 1:1 (Square)
   - 21:9 (Cinematic)
 - **🔧 Manual Adjustments**:
-  - ➡️ Move the crop area using the arrow keys.
-  - 🔍 Resize the crop box using the `+` and `-` keys, or the mouse scroll wheel.
-  - 🔬 Fine-tune zoom and cropping adjustments with precise controls.
-- **📏 Guidelines**: Display rule-of-thirds and center guidelines within the crop box to help you compose your image perfectly.
-- **💾 Save Options**:
-  - Press `Enter` to save the current crop and automatically move to the next image.
-  - Press `S` to save the current crop without moving to the next image.
-  - Every save starts at `_v1`, and the version number increases with each subsequent save.
-- **📂 Auto Folder Management**: Edited images are saved to a new folder named after the original folder with `_edited` appended.
-- **📂 Auto Folder Opening**: After exiting the app, the source folder of the images is automatically opened for convenience.
+  - ➡️ Move the crop area using arrow keys.
+  - 🔍 Resize the crop box with `+` and `-` keys or the mouse scroll wheel.
+  - 🔬 Fine-tune zoom and cropping with precise controls.
+- **📏 Guidelines**: Rule-of-thirds and center guidelines for better composition.
+- **💾 Smart Save**:
+  - Press `Enter` to save the current crop and move to the next image.
+  - Press `S` to save without moving to the next image.
+  - Each saved image has an automatic version number starting at `_v1`.
+- **📂 Auto Folder Management**: Edited images are automatically saved in a subfolder with `_edited` appended to the original folder.
+- **📂 Auto Folder Opening**: After closing the app, the source folder of the images opens automatically.
 
 ## 📸 Cropping Examples
 
-Here are two examples showcasing how images are being cropped using Quick Editor:
+Here are two examples showcasing how images are cropped using QuickEditor:
 
 ### Example 1: Cropping to 16:9 Aspect Ratio
 
-![16:8 Crop Example](images/screenshot1.png)
-*This image is being cropped using the 16:9 horizontal preset with rule-of-thirds guidelines.*
+![16:9 Crop Example](images/screenshot1.png)  
+*This image is cropped using the 16:9 horizontal preset with rule-of-thirds guidelines.*
 
 ### Example 2: Cropping to 4:3 Aspect Ratio
 
-![4:3 Crop Example](images/screenshot2.png)
-*This image is being cropped using the 4:3 horizontal preset with guidelines for better composition.*
+![4:3 Crop Example](images/screenshot2.png)  
+*This image is cropped using the 4:3 horizontal preset with composition guidelines.*
 
-## ⚙️ Installation
+## 🚀 Latest Release: QuickEditor v1.0
+
+The first official release of **QuickEditor v1.0** is now live! It includes all the essential features for fast, efficient image cropping. You can download it directly from the **[Releases](https://github.com/AldogPlays/QuickEditor/releases)** page.
+
+### How to Use the v1.0 Release:
+1. **Download** the `QuickEditor.exe` from the release page.
+2. **Run** the `QuickEditor.exe`—no installation required!
+3. Start cropping your images right away.
+
+## ⚙️ Installation (For Source Code Users)
 
 ### 📋 Prerequisites
 
@@ -48,15 +57,15 @@ Here are two examples showcasing how images are being cropped using Quick Editor
 
 ### 🛠️ Install Dependencies
 
-You can install the dependencies using `pip`. Open your terminal or command prompt and run the following command:
+You can install dependencies with `pip` by running the following command in your terminal:
 
 ```bash
 pip install pillow
 ```
 
-### 🚀 Running the App
+### 🚀 Running the App from Source
 
-1. Clone or download the Quick Editor repository to your local machine.
+1. Clone or download the QuickEditor repository to your machine.
 2. Navigate to the project directory.
 3. Run the application using Python:
 
@@ -64,20 +73,20 @@ pip install pillow
 python main.py
 ```
 
-## 🖼️ Usage
+## 🖼️ Usage Guide
 
-1. **🗂️ Select Folder**: After launching Quick Editor, click the "Select Folder" button to choose a folder containing the images you want to edit.
-2. **✂️ Crop Presets**: Use the number keys `1` through `6` to select a cropping preset:
+1. **🗂️ Select Folder**: Click "Select Folder" and choose the folder containing your images.
+2. **✂️ Crop Presets**: Use keys `1` through `6` to select a crop preset:
    - `1`: 16:9 (Horizontal)
    - `2`: 9:16 (Vertical)
    - `3`: 4:3 (Horizontal)
    - `4`: 3:4 (Vertical)
    - `5`: 1:1 (Square)
    - `6`: 21:9 (Cinematic)
-3. **📏 Adjust Crop Box**: Use the arrow keys to move the crop box and `+` or `-` to resize it. You can also use the mouse scroll wheel for zooming in and out.
-4. **📐 Guidelines**: Rule-of-thirds and center guidelines are shown within the crop area to assist in aligning the composition.
-5. **💾 Save and Proceed**: Press `Enter` to save the cropped image (starting with `_v1`) and move to the next image. Press `S` to save without moving to the next image.
-6. **❌ Exit Fullscreen**: Press `Esc` to exit fullscreen mode at any time.
+3. **📏 Adjust Crop Box**: Move the crop box with arrow keys and resize it with `+` or `-`. Mouse scroll for zooming in/out.
+4. **📐 Guidelines**: Use rule-of-thirds and center guidelines for perfect alignment.
+5. **💾 Save**: Press `Enter` to save and move to the next image, or `S` to save without moving to the next.
+6. **❌ Exit Fullscreen**: Press `Esc` at any time to exit fullscreen mode.
 
 ### ⌨️ Key Bindings
 
@@ -87,20 +96,21 @@ python main.py
 | ⬅️ ➡️ 🔼 🔽 | Move crop box (left, right, up, down) |
 | `+` / `-` | Resize crop box (zoom in / zoom out) |
 | 🖱️ `Mouse Scroll` | Resize crop box (zoom in / zoom out) |
-| 🔑 `Enter` | Save cropped image (start at `_v1`, increment version) and move to next image |
-| `S` | Save cropped image (start at `_v1`, increment version) without moving to the next image |
-| `N` | Move to the next image without saving |
+| 🔑 `Enter` | Save and move to the next image |
+| `S` | Save without moving to the next image |
+| `N` | Skip to the next image without saving |
 | ❌ `Esc` | Exit fullscreen mode |
 
 ## 📂 Folder Structure
 
-When you select a folder containing images, the edited images will be saved to a subfolder with `_edited` appended to the original folder name.
+When you select a folder, edited images are saved in a subfolder with `_edited` appended to the folder name.
 
-For example:
+Example:
 - Original folder: `VacationPhotos`
 - Edited folder: `VacationPhotos_edited`
 
-Each saved image will have a version suffix (`_v1`, `_v2`, etc.). For example:
+Each image will have a version suffix (`_v1`, `_v2`, etc.):
+
 - `image_v1.png`
 - `image_v2.png`
 
@@ -108,4 +118,8 @@ Each saved image will have a version suffix (`_v1`, `_v2`, etc.). For example:
 
 ### ⚠️ Issue: The app closes but doesn’t open the folder
 
-Ensure that you have correctly selected a folder. If you are using an operating system other than Windows, the `os.startfile()` function may not be supported. On non-Windows systems, you may need to manually navigate to the folder where the original images are located.
+Make sure you’ve selected the correct folder. On non-Windows systems, `os.startfile()` may not be supported, so you may need to manually navigate to the folder.
+
+---
+
+Check out the **[Releases](https://github.com/AldogPlays/QuickEditor/releases)** page for the latest version and future updates!
