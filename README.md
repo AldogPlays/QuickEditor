@@ -1,7 +1,3 @@
-Sure! Here’s a sample `README.md` file for the "Quick Editor" project that outlines its features, installation, usage, and functionality.
-
-### `README.md`
-
 ```md
 # Quick Editor
 
