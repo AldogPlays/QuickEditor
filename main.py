@@ -1,6 +1,7 @@
 import os
 import atexit
 from tkinter import Tk, filedialog, Canvas, Button, Label, Frame
+from tkinter import StringVar
 from PIL import Image, ImageTk
 
 class CropperApp:
@@ -28,30 +29,49 @@ class CropperApp:
         self.source_folder = None  # Store the source folder path
         self.edits_folder = None  # Store the folder for edited images
 
+        # Initialize UI variables
+        self.crop_info = StringVar()
+        self.image_info = StringVar()
+
         # Get the screen resolution
         self.screen_width = self.root.winfo_screenwidth()
         self.screen_height = self.root.winfo_screenheight()
 
         # Load UI elements
-        self.canvas = Canvas(self.root, width=self.screen_width, height=self.screen_height)
+        self.canvas = Canvas(self.root, width=self.screen_width, height=self.screen_height, bg="#2D2D2D")
         self.canvas.pack()
 
-        # Create a GUI overlay frame
-        self.overlay_frame = Frame(self.root, bg="black", bd=2)
+        # Create a header frame
+        self.header_frame = Frame(self.root, bg="#3B3B3B", bd=2, relief="flat", padx=10, pady=10)
+        self.header_frame.place(relx=0.5, rely=0.05, anchor='center')
+
+        # Add title to header
+        self.title_label = Label(self.header_frame, text="Image Cropper", font=("Roboto", 18, "bold"), fg="white", bg="#3B3B3B")
+        self.title_label.pack()
+
+        # Create a GUI overlay frame for controls
+        self.overlay_frame = Frame(self.root, bg="#3B3B3B", bd=2, relief="flat", padx=10, pady=10)
         self.overlay_frame.place(relx=0.5, rely=0.9, anchor='center')
 
-        # Add buttons and labels to the overlay frame
-        self.next_button = Button(self.overlay_frame, text="Next", command=self.save_and_next_image)
-        self.next_button.pack(side="left")
+        # Style buttons with modern design
+        button_style = {"bg": "#3A85FF", "fg": "white", "font": ("Roboto", 12), "relief": "flat", "bd": 0, "width": 12, "height": 2}
 
-        self.exit_button = Button(self.overlay_frame, text="Exit Fullscreen", command=self.exit_fullscreen)
-        self.exit_button.pack(side="left")
+        # Add buttons to the overlay frame
+        self.next_button = Button(self.overlay_frame, text="Next", command=self.save_and_next_image, **button_style)
+        self.next_button.pack(side="left", padx=10)
 
-        self.status_label = Label(self.overlay_frame, text="", bg="black", fg="white")
-        self.status_label.pack(side="left")
+        self.exit_button = Button(self.overlay_frame, text="Exit Fullscreen", command=self.exit_fullscreen, **button_style)
+        self.exit_button.pack(side="left", padx=10)
 
-        self.load_button = Button(self.overlay_frame, text="Select Folder", command=self.load_folder)
-        self.load_button.pack(side="left")
+        self.load_button = Button(self.overlay_frame, text="Select Folder", command=self.load_folder, **button_style)
+        self.load_button.pack(side="left", padx=10)
+
+        # Add dynamic labels for crop info and image info
+        self.crop_info_label = Label(self.overlay_frame, textvariable=self.crop_info, bg="#3B3B3B", fg="white", font=("Roboto", 12))
+        self.crop_info_label.pack(side="left", padx=20)
+
+        self.image_info_label = Label(self.overlay_frame, textvariable=self.image_info, bg="#3B3B3B", fg="white", font=("Roboto", 12))
+        self.image_info_label.pack(side="left", padx=20)
 
         # Bind arrow keys, Enter, plus/minus keys for crop resizing
         self.root.bind("<Left>", self.move_left)
@@ -136,6 +156,9 @@ class CropperApp:
         # Draw guidelines centered in the crop area
         self.draw_guidelines()
 
+        # Update crop information dynamically
+        self.update_crop_info()
+
     def draw_shaded_areas(self):
         # Draw shaded areas to represent the crop box
         x1, y1, x2, y2 = self.crop_box
@@ -203,12 +226,12 @@ class CropperApp:
         self.display_image()
 
     def increase_crop_size(self, event):
-        # Increase the size of the crop box
-        self.resize_crop_box(1.05)
+        # Increase the size of the crop box (granular zoom)
+        self.resize_crop_box(1.05)  # Adjusted for smaller zoom increments
 
     def decrease_crop_size(self, event):
-        # Decrease the size of the crop box
-        self.resize_crop_box(0.95)
+        # Decrease the size of the crop box (granular zoom)
+        self.resize_crop_box(0.95)  # Adjusted for smaller zoom increments
 
     def resize_crop_box(self, factor):
         # Resize the crop box by a factor (greater than 1 increases, less than 1 decreases)
@@ -260,7 +283,15 @@ class CropperApp:
     def update_status(self):
         # Update the status label with current image index, crop preset, and total images
         preset_name = f"Preset {self.current_preset}: {self.crop_presets[self.current_preset][0]}:{self.crop_presets[self.current_preset][1]}"
-        self.status_label.config(text=f"Image {self.current_image_index + 1} of {len(self.images)} | {preset_name}")
+        self.image_info.set(f"Image {self.current_image_index + 1} of {len(self.images)} | {preset_name}")
+
+    def update_crop_info(self):
+        # Display crop dimensions and aspect ratio
+        x1, y1, x2, y2 = self.crop_box
+        width = x2 - x1
+        height = y2 - y1
+        aspect_ratio = width / height if height != 0 else 0
+        self.crop_info.set(f"Crop: {width}x{height} | Aspect Ratio: {aspect_ratio:.2f}")
 
     def set_crop_preset(self, event):
         # Set the crop preset based on the number key pressed
