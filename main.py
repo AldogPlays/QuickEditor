@@ -3,6 +3,7 @@ from tkinter import Tk, filedialog, Canvas, Button, Label, Frame
 from tkinter import StringVar
 from PIL import Image, ImageTk
 
+
 class CropperApp:
     def __init__(self, root):
         self.root = root
@@ -18,10 +19,10 @@ class CropperApp:
         self.crop_presets = {
             1: (16, 9),  # Horizontal 16:9
             2: (9, 16),  # Vertical 9:16
-            3: (4, 3),   # Horizontal 4:3
-            4: (3, 4),   # Vertical 3:4
-            5: (1, 1),   # Square 1:1
-            6: (21, 9)   # Horizontal cinematic 21:9
+            3: (4, 3),  # Horizontal 4:3
+            4: (3, 4),  # Vertical 3:4
+            5: (1, 1),  # Square 1:1
+            6: (21, 9)  # Horizontal cinematic 21:9
         }
         self.current_preset = 1  # Start with preset 1 (16:9)
         self.shift_amount = 10  # Amount of shift per arrow key press
@@ -37,7 +38,8 @@ class CropperApp:
         self.screen_height = self.root.winfo_screenheight()
 
         # Load UI elements
-        self.canvas = Canvas(self.root, width=self.screen_width, height=self.screen_height, bg="black", highlightthickness=0)
+        self.canvas = Canvas(self.root, width=self.screen_width, height=self.screen_height, bg="black",
+                             highlightthickness=0)
         self.canvas.pack()
 
         # Create a GUI overlay frame for controls
@@ -45,21 +47,26 @@ class CropperApp:
         self.overlay_frame.place(relx=0.5, rely=0.9, anchor='center')
 
         # Add buttons to the overlay frame
-        self.next_button = Button(self.overlay_frame, text="Next", command=self.save_and_next_image, padx=10, pady=5, font=("Helvetica", 12))
+        self.next_button = Button(self.overlay_frame, text="Next", command=self.save_and_next_image, padx=10, pady=5,
+                                  font=("Helvetica", 12))
         self.next_button.pack(side="left", padx=5)
 
-        self.exit_button = Button(self.overlay_frame, text="Exit Fullscreen", command=self.exit_fullscreen, padx=10, pady=5, font=("Helvetica", 12))
+        self.exit_button = Button(self.overlay_frame, text="Exit Fullscreen", command=self.exit_fullscreen, padx=10,
+                                  pady=5, font=("Helvetica", 12))
         self.exit_button.pack(side="left", padx=5)
 
-        self.load_button = Button(self.overlay_frame, text="Select Folder", command=self.load_folder, padx=10, pady=5, font=("Helvetica", 12))
+        self.load_button = Button(self.overlay_frame, text="Select Folder", command=self.load_folder, padx=10, pady=5,
+                                  font=("Helvetica", 12))
         self.load_button.pack(side="left", padx=5)
 
         # Labels to show original image and cropped area specs
-        self.original_image_label = Label(self.root, textvariable=self.original_image_info, bg="black", fg="white", font=("Helvetica", 12), anchor="w")
+        self.original_image_label = Label(self.root, textvariable=self.original_image_info, bg="black", fg="white",
+                                          font=("Helvetica", 12), anchor="nw", justify="left")
         self.original_image_label.place(x=10, y=10)
 
-        self.cropped_area_label = Label(self.root, textvariable=self.cropped_area_info, bg="black", fg="white", font=("Helvetica", 12), anchor="e")
-        self.cropped_area_label.place(x=self.screen_width - 300, y=10)
+        self.cropped_area_label = Label(self.root, textvariable=self.cropped_area_info, bg="black", fg="white",
+                                        font=("Helvetica", 12), anchor="ne", justify="right")
+        self.cropped_area_label.place(x=self.screen_width - 310, y=10)
 
         # Bind arrow keys, Enter, plus/minus keys for crop resizing
         self.root.bind("<Left>", self.move_left)
@@ -85,7 +92,8 @@ class CropperApp:
         # Let user select a folder and load all image paths from it
         folder = filedialog.askdirectory()
         if folder:
-            self.images = [os.path.join(folder, f) for f in os.listdir(folder) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+            self.images = [os.path.join(folder, f) for f in os.listdir(folder) if
+                           f.lower().endswith(('.png', '.jpg', '.jpeg'))]
             self.source_folder = folder  # Store the selected folder
 
             # Get the parent folder name and append '_edited'
@@ -112,10 +120,21 @@ class CropperApp:
         self.update_crop_info()
 
     def update_original_image_info(self, img_path):
-        # Update the original image information: dimensions and file size
+        # Update the original image information: dimensions, file size, DPI, and color mode
         width, height = self.original_image.size
-        file_size = os.path.getsize(img_path) // 1024  # File size in KB
-        self.original_image_info.set(f"Original: {width}x{height}px | {file_size} KB")
+        file_size_kb = os.path.getsize(img_path) // 1024  # File size in KB
+        file_size_mb = file_size_kb / 1024  # File size in MB
+        dpi = self.original_image.info.get('dpi', (72, 72))  # Default to 72 DPI if not found
+        color_mode = self.original_image.mode  # Color mode (e.g., RGB, CMYK)
+
+        # Display in top-left (vertically stacked)
+        self.original_image_info.set(
+            f"Original Image Info:\n"
+            f"Resolution: {width}x{height}px\n"
+            f"File Size: {file_size_kb} KB ({file_size_mb:.2f} MB)\n"
+            f"DPI: {dpi[0]}x{dpi[1]}\n"
+            f"Color Mode: {color_mode}"
+        )
 
     def set_initial_crop_box(self):
         # Set the crop box based on the current preset's aspect ratio
@@ -165,7 +184,23 @@ class CropperApp:
         width = x2 - x1
         height = y2 - y1
         aspect_ratio = width / height if height != 0 else 0
-        self.cropped_area_info.set(f"Cropped: {width}x{height}px | Aspect Ratio: {aspect_ratio:.2f}")
+
+        # Calculate the percentage of the original image the cropped area covers
+        original_width, original_height = self.original_image.size
+        crop_percentage = (width * height) / (original_width * original_height) * 100
+
+        # Estimate cropped area file size
+        file_size_kb = os.path.getsize(self.images[self.current_image_index]) // 1024
+        cropped_file_size_kb = file_size_kb * (crop_percentage / 100)
+
+        # Display in top-right (vertically stacked)
+        self.cropped_area_info.set(
+            f"Cropped Area Info:\n"
+            f"Resolution: {width}x{height}px\n"
+            f"Aspect Ratio: {aspect_ratio:.2f}\n"
+            f"Crop Area: {crop_percentage:.2f}% of original\n"
+            f"Est. File Size: {cropped_file_size_kb:.2f} KB"
+        )
 
     def draw_shaded_areas(self):
         # Draw shaded areas to represent the crop box
@@ -179,12 +214,16 @@ class CropperApp:
 
         # Draw shaded rectangles outside the crop box
         self.canvas.create_rectangle(0, 0, scaled_crop_box[0], self.screen_height, fill='black', stipple='gray50')
-        self.canvas.create_rectangle(scaled_crop_box[2], 0, self.screen_width, self.screen_height, fill='black', stipple='gray50')
-        self.canvas.create_rectangle(scaled_crop_box[0], 0, scaled_crop_box[2], scaled_crop_box[1], fill='black', stipple='gray50')
-        self.canvas.create_rectangle(scaled_crop_box[0], scaled_crop_box[3], scaled_crop_box[2], self.screen_height, fill='black', stipple='gray50')
+        self.canvas.create_rectangle(scaled_crop_box[2], 0, self.screen_width, self.screen_height, fill='black',
+                                     stipple='gray50')
+        self.canvas.create_rectangle(scaled_crop_box[0], 0, scaled_crop_box[2], scaled_crop_box[1], fill='black',
+                                     stipple='gray50')
+        self.canvas.create_rectangle(scaled_crop_box[0], scaled_crop_box[3], scaled_crop_box[2], self.screen_height,
+                                     fill='black', stipple='gray50')
 
         # Add a visible white border around the crop area
-        self.canvas.create_rectangle(scaled_crop_box[0], scaled_crop_box[1], scaled_crop_box[2], scaled_crop_box[3], outline='white', width=3)
+        self.canvas.create_rectangle(scaled_crop_box[0], scaled_crop_box[1], scaled_crop_box[2], scaled_crop_box[3],
+                                     outline='white', width=3)
 
     def draw_guidelines(self):
         # Draw guidelines centered in the crop box
@@ -198,12 +237,14 @@ class CropperApp:
 
         # Vertical guidelines (thirds and center)
         self.canvas.create_line(x1 + third_width, y1, x1 + third_width, y2, fill='white', dash=(4, 2))  # Left third
-        self.canvas.create_line(x1 + 2 * third_width, y1, x1 + 2 * third_width, y2, fill='white', dash=(4, 2))  # Right third
+        self.canvas.create_line(x1 + 2 * third_width, y1, x1 + 2 * third_width, y2, fill='white',
+                                dash=(4, 2))  # Right third
         self.canvas.create_line((x1 + x2) / 2, y1, (x1 + x2) / 2, y2, fill='white', dash=(4, 2))  # Center line
 
         # Horizontal guidelines (thirds and center)
         self.canvas.create_line(x1, y1 + third_height, x2, y1 + third_height, fill='white', dash=(4, 2))  # Top third
-        self.canvas.create_line(x1, y1 + 2 * third_height, x2, y1 + 2 * third_height, fill='white', dash=(4, 2))  # Bottom third
+        self.canvas.create_line(x1, y1 + 2 * third_height, x2, y1 + 2 * third_height, fill='white',
+                                dash=(4, 2))  # Bottom third
         self.canvas.create_line(x1, (y1 + y2) / 2, x2, (y1 + y2) / 2, fill='white', dash=(4, 2))  # Center line
 
     def move_left(self, event):
@@ -300,6 +341,7 @@ class CropperApp:
         if self.source_folder:
             os.startfile(self.source_folder)
         self.root.destroy()
+
 
 if __name__ == "__main__":
     root = Tk()
