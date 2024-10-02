@@ -90,14 +90,4 @@ Ensure that you have correctly selected a folder, and make sure you have Pythonâ
 
 Feel free to fork the repository and submit pull requests for improvements, bug fixes, or new features.
 
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
-```
-
-### How to Use this `README.md`:
-
-1. Copy the content above and save it to a file called `README.md` in your project directory.
-2. It describes the core features, installation instructions, usage guide, key bindings, and the folder structure for the edited images.
-
 Let me know if you'd like any further adjustments!
