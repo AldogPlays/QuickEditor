@@ -1,4 +1,5 @@
 import os
+import atexit
 from tkinter import Tk, filedialog, Canvas, Button, Label, Frame
 from PIL import Image, ImageTk
 
@@ -24,6 +25,8 @@ class CropperApp:
         }
         self.current_preset = 1  # Start with preset 1 (16:9)
         self.shift_amount = 10  # Amount of shift per arrow key press
+        self.source_folder = None  # Store the source folder path
+        self.edits_folder = None  # Store the folder for edited images
 
         # Get the screen resolution
         self.screen_width = self.root.winfo_screenwidth()
@@ -60,22 +63,34 @@ class CropperApp:
         self.root.bind("+", self.increase_crop_size)
         self.root.bind("-", self.decrease_crop_size)
 
-        # Bind mouse scroll to resize crop box (inverted scroll behavior)
+        # Bind mouse scroll to resize crop box
         self.canvas.bind("<MouseWheel>", self.handle_scroll)
 
         # Bind number keys 1-6 for different crop presets
         for i in range(1, 7):
             self.root.bind(str(i), self.set_crop_preset)
 
+        # Bind exit protocol
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
+
+        # Register the exit handler with atexit (pass source_folder from the instance)
+        atexit.register(self.on_atexit)
+
     def load_folder(self):
         # Let user select a folder and load all image paths from it
         folder = filedialog.askdirectory()
         if folder:
             self.images = [os.path.join(folder, f) for f in os.listdir(folder) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
-            self.source_folder = folder
-            self.edits_folder = os.path.join(self.source_folder, "edits")
+            self.source_folder = folder  # Store the selected folder
+
+            # Get the parent folder name and append '_edited'
+            parent_folder_name = os.path.basename(self.source_folder)
+            self.edits_folder = os.path.join(self.source_folder, f"{parent_folder_name}_edited")
+
+            # Create the folder for edited images if it doesn't exist
             if not os.path.exists(self.edits_folder):
                 os.makedirs(self.edits_folder)
+
             if self.images:
                 self.load_image()
 
@@ -118,6 +133,9 @@ class CropperApp:
         # Draw the shaded areas outside the crop box
         self.draw_shaded_areas()
 
+        # Draw guidelines centered in the crop area
+        self.draw_guidelines()
+
     def draw_shaded_areas(self):
         # Draw shaded areas to represent the crop box
         x1, y1, x2, y2 = self.crop_box
@@ -139,6 +157,26 @@ class CropperApp:
         self.canvas.create_rectangle(scaled_crop_box[2], 0, self.screen_width, self.screen_height, fill='black', stipple='gray50')
         self.canvas.create_rectangle(scaled_crop_box[0], 0, scaled_crop_box[2], scaled_crop_box[1], fill='black', stipple='gray50')
         self.canvas.create_rectangle(scaled_crop_box[0], scaled_crop_box[3], scaled_crop_box[2], self.screen_height, fill='black', stipple='gray50')
+
+    def draw_guidelines(self):
+        # Draw guidelines centered in the crop box
+        x1, y1, x2, y2 = self.crop_box
+        width = x2 - x1
+        height = y2 - y1
+
+        # Calculate thirds
+        third_width = width / 3
+        third_height = height / 3
+
+        # Vertical guidelines (thirds and center)
+        self.canvas.create_line(x1 + third_width, y1, x1 + third_width, y2, fill='white', dash=(4, 2))  # Left third
+        self.canvas.create_line(x1 + 2 * third_width, y1, x1 + 2 * third_width, y2, fill='white', dash=(4, 2))  # Right third
+        self.canvas.create_line((x1 + x2) / 2, y1, (x1 + x2) / 2, y2, fill='white', dash=(4, 2))  # Center line
+
+        # Horizontal guidelines (thirds and center)
+        self.canvas.create_line(x1, y1 + third_height, x2, y1 + third_height, fill='white', dash=(4, 2))  # Top third
+        self.canvas.create_line(x1, y1 + 2 * third_height, x2, y1 + 2 * third_height, fill='white', dash=(4, 2))  # Bottom third
+        self.canvas.create_line(x1, (y1 + y2) / 2, x2, (y1 + y2) / 2, fill='white', dash=(4, 2))  # Center line
 
     def move_left(self, event):
         # Move the crop box left by shift_amount pixels
@@ -166,11 +204,11 @@ class CropperApp:
 
     def increase_crop_size(self, event):
         # Increase the size of the crop box
-        self.resize_crop_box(1.1)
+        self.resize_crop_box(1.05)
 
     def decrease_crop_size(self, event):
         # Decrease the size of the crop box
-        self.resize_crop_box(0.9)
+        self.resize_crop_box(0.95)
 
     def resize_crop_box(self, factor):
         # Resize the crop box by a factor (greater than 1 increases, less than 1 decreases)
@@ -193,26 +231,31 @@ class CropperApp:
         self.display_image()
 
     def handle_scroll(self, event):
-        # Inverted mouse scroll: scroll up decreases size, scroll down increases size
+        # Handle mouse scroll to resize crop box (inverted scroll behavior)
         if event.delta > 0:
             self.decrease_crop_size(None)  # Scroll up decreases size
         else:
             self.increase_crop_size(None)  # Scroll down increases size
 
     def save_and_next_image(self, event=None):
-        # Save the cropped image to the edits folder and proceed to the next image
-        cropped_image = self.original_image.crop(self.crop_box)
-        img_path = self.images[self.current_image_index]
-        img_name = os.path.basename(img_path)
-        save_path = os.path.join(self.edits_folder, img_name)
-        cropped_image.save(save_path)
-
-        # Move to the next image
-        self.current_image_index += 1
+        # Save the cropped image to the edited folder and proceed to the next image
         if self.current_image_index < len(self.images):
-            self.load_image()
+            cropped_image = self.original_image.crop(self.crop_box)
+            img_path = self.images[self.current_image_index]
+            img_name = os.path.basename(img_path)
+            save_path = os.path.join(self.edits_folder, img_name)
+            cropped_image.save(save_path)
+
+            # Move to the next image
+            self.current_image_index += 1
+            if self.current_image_index < len(self.images):
+                self.load_image()
+            else:
+                # If no more images, update the label and stop
+                self.status_label.config(text="All images processed!")
         else:
-            self.status_label.config(text="All images processed!")
+            # If the index is already out of range, stop processing
+            self.status_label.config(text="No more images to process!")
 
     def update_status(self):
         # Update the status label with current image index, crop preset, and total images
@@ -229,6 +272,17 @@ class CropperApp:
     def exit_fullscreen(self, event=None):
         # Exit fullscreen mode when the Escape key or button is pressed
         self.root.attributes('-fullscreen', False)
+
+    def on_close(self):
+        # Open the parent folder on close
+        if self.source_folder:
+            os.startfile(self.source_folder)
+        self.root.destroy()
+
+    def on_atexit(self):
+        # Called during atexit to open the source folder if available
+        if self.source_folder:
+            os.startfile(self.source_folder)
 
 if __name__ == "__main__":
     root = Tk()
