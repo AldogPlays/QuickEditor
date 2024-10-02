@@ -1,4 +1,3 @@
-```md
 # Quick Editor
 
 Quick Editor is a simple image cropper designed to allow you to quickly edit and crop multiple images using predefined cropping presets. The app provides a fast and intuitive interface for batch-editing images, with dynamic zoom and manual crop box adjustments.
