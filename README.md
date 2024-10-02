@@ -24,6 +24,20 @@ Quick Editor is a simple image cropper designed to allow you to quickly edit and
 - **📂 Auto Folder Management**: Edited images are saved to a new folder named after the original folder with `_edited` appended.
 - **📂 Auto Folder Opening**: After exiting the app, the source folder of the images is automatically opened for convenience.
 
+## 📸 Cropping Examples
+
+Here are two examples showcasing how images are being cropped using Quick Editor:
+
+### Example 1: Cropping to 16:9 Aspect Ratio
+
+![16:8 Crop Example](images/screenshot1.png)
+*This image is being cropped using the 16:9 horizontal preset with rule-of-thirds guidelines.*
+
+### Example 2: Cropping to 4:3 Aspect Ratio
+
+![4:3 Crop Example](images/screenshot2.png)
+*This image is being cropped using the 4:3 horizontal preset with guidelines for better composition.*
+
 ## ⚙️ Installation
 
 ### 📋 Prerequisites
@@ -89,7 +103,6 @@ For example:
 Each saved image will have a version suffix (`_v1`, `_v2`, etc.). For example:
 - `image_v1.png`
 - `image_v2.png`
-- ...
 
 ## 🛠️ Troubleshooting
 
