@@ -186,11 +186,23 @@ class CropperApp:
         self.canvas.create_image(0, 0, anchor="nw", image=self.tk_image)
 
     def update_crop_info(self):
-        # Display crop dimensions and aspect ratio
+        # Display crop dimensions
         x1, y1, x2, y2 = self.crop_box
         width = x2 - x1
         height = y2 - y1
-        aspect_ratio = width / height if height != 0 else 0
+
+        # Aspect ratio preset names
+        aspect_ratio_names = {
+            1: "16:9 (Horizontal)",
+            2: "9:16 (Vertical)",
+            3: "4:3 (Horizontal)",
+            4: "3:4 (Vertical)",
+            5: "1:1 (Square)",
+            6: "21:9 (Cinematic)"
+        }
+
+        # Get the name of the selected crop preset
+        aspect_ratio_name = aspect_ratio_names.get(self.current_preset, "Unknown")
 
         # Calculate the percentage of the original image the cropped area covers
         original_width, original_height = self.original_image.size
@@ -204,7 +216,7 @@ class CropperApp:
         self.cropped_area_info.set(
             f"Cropped Area Info:\n"
             f"Resolution: {width}x{height}px\n"
-            f"Aspect Ratio: {aspect_ratio:.2f}\n"
+            f"Aspect Ratio: {aspect_ratio_name}\n"  # Display the aspect ratio preset name
             f"Crop Area: {crop_percentage:.2f}% of original\n"
             f"Est. File Size: {cropped_file_size_kb:.2f} KB"
         )
