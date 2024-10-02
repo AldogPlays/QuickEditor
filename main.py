@@ -38,40 +38,37 @@ class CropperApp:
         self.screen_height = self.root.winfo_screenheight()
 
         # Load UI elements
-        self.canvas = Canvas(self.root, width=self.screen_width, height=self.screen_height, bg="#2D2D2D")
+        self.canvas = Canvas(self.root, width=self.screen_width, height=self.screen_height, bg="black")
         self.canvas.pack()
 
         # Create a header frame
-        self.header_frame = Frame(self.root, bg="#3B3B3B", bd=2, relief="flat", padx=10, pady=10)
+        self.header_frame = Frame(self.root, bg="gray20", bd=2, relief="sunken")
         self.header_frame.place(relx=0.5, rely=0.05, anchor='center')
 
         # Add title to header
-        self.title_label = Label(self.header_frame, text="Image Cropper", font=("Roboto", 18, "bold"), fg="white", bg="#3B3B3B")
+        self.title_label = Label(self.header_frame, text="Image Cropper", font=("Helvetica", 16), fg="white", bg="gray20")
         self.title_label.pack()
 
         # Create a GUI overlay frame for controls
-        self.overlay_frame = Frame(self.root, bg="#3B3B3B", bd=2, relief="flat", padx=10, pady=10)
+        self.overlay_frame = Frame(self.root, bg="gray20", bd=2)
         self.overlay_frame.place(relx=0.5, rely=0.9, anchor='center')
 
-        # Style buttons with modern design
-        button_style = {"bg": "#3A85FF", "fg": "white", "font": ("Roboto", 12), "relief": "flat", "bd": 0, "width": 12, "height": 2}
-
         # Add buttons to the overlay frame
-        self.next_button = Button(self.overlay_frame, text="Next", command=self.save_and_next_image, **button_style)
-        self.next_button.pack(side="left", padx=10)
+        self.next_button = Button(self.overlay_frame, text="Next", command=self.save_and_next_image, padx=10, pady=5, font=("Helvetica", 12))
+        self.next_button.pack(side="left", padx=5)
 
-        self.exit_button = Button(self.overlay_frame, text="Exit Fullscreen", command=self.exit_fullscreen, **button_style)
-        self.exit_button.pack(side="left", padx=10)
+        self.exit_button = Button(self.overlay_frame, text="Exit Fullscreen", command=self.exit_fullscreen, padx=10, pady=5, font=("Helvetica", 12))
+        self.exit_button.pack(side="left", padx=5)
 
-        self.load_button = Button(self.overlay_frame, text="Select Folder", command=self.load_folder, **button_style)
-        self.load_button.pack(side="left", padx=10)
+        self.load_button = Button(self.overlay_frame, text="Select Folder", command=self.load_folder, padx=10, pady=5, font=("Helvetica", 12))
+        self.load_button.pack(side="left", padx=5)
 
         # Add dynamic labels for crop info and image info
-        self.crop_info_label = Label(self.overlay_frame, textvariable=self.crop_info, bg="#3B3B3B", fg="white", font=("Roboto", 12))
-        self.crop_info_label.pack(side="left", padx=20)
+        self.crop_info_label = Label(self.overlay_frame, textvariable=self.crop_info, bg="gray20", fg="white", font=("Helvetica", 12))
+        self.crop_info_label.pack(side="left", padx=10)
 
-        self.image_info_label = Label(self.overlay_frame, textvariable=self.image_info, bg="#3B3B3B", fg="white", font=("Roboto", 12))
-        self.image_info_label.pack(side="left", padx=20)
+        self.image_info_label = Label(self.overlay_frame, textvariable=self.image_info, bg="gray20", fg="white", font=("Helvetica", 12))
+        self.image_info_label.pack(side="left", padx=10)
 
         # Bind arrow keys, Enter, plus/minus keys for crop resizing
         self.root.bind("<Left>", self.move_left)
